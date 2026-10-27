@@ -84,6 +84,7 @@
         const box = document.querySelector(".dialogue-box");
         let index = 0;
         let line = 2;
+        let delay = 3000; 
         let timer;
         let ready = false;
         let done = false;
@@ -120,7 +121,7 @@
         });
         function runText(){
             done = false;
-            const delay = 3000; 
+            
             const wait = new Promise(resolve => setTimeout(resolve, delay));
             const fontLoaded = document.fonts
             .load('32px "Determination Mono"')
@@ -136,6 +137,7 @@
         });
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Enter') {
+                delay = 0;
                 if (done == true){
                 if (line == messages.length - 1) {
                     line = 0;
