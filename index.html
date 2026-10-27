@@ -65,35 +65,69 @@
     .dialogue-box {
     visibility: hidden;
 }
-    
+    #text {
+    width: 100%;
+    white-space: normal;
+}
+
+.dialogue-line {
+    display: flex;
+    gap: 0.6em;
+    align-items: flex-start;
+}
+
+.dialogue-line::before {
+    content: "*";
+    flex-shrink: 0;
+}
+
+.line-content {
+    min-width: 0;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
 </style>
 </head>
 
 <body>
     <div class="dialogue-box">
-        <span class="asterisk">*</span>
-        <span id="text"></span>
+       <div id="text"></div>
         
     </div>
     
     
     <script>
-        const messages = ["but it refused","hi","..."];
+        const messages = ["Howdy\nI'm FLOWEY.\nFLOWEY the FLOWER","Hmmm...","You're new to the UNDERGROUND, aren'tcha", "Golly, you must be so confused.","Someone ought to teach you how things work around here!", "I guess little old me will have to do.", "Ready?\nHere we go!"];
         const typingSpeed = 55;
         const text = document.getElementById("text");
         const box = document.querySelector(".dialogue-box");
         let index = 0;
-        let line = 2;
-        let delay = 3000; 
+        let line = 0;
+        let delay = 30; 
         let timer;
         let ready = false;
         let done = false;
+        function renderText(value) {
+            text.replaceChildren();
 
+            value.split("\n").forEach(function (part) {
+                const row = document.createElement("div");
+                row.className = "dialogue-line";
+
+                const content = document.createElement("span");
+                content.className = "line-content";
+                content.textContent = part;
+
+                row.appendChild(content);
+                text.appendChild(row);
+            });
+        }
 
         function typeLetter() {
+            
             if (index < messages[line].length) {
                 index++;
-                text.textContent = messages[line].slice(0, index);
+                renderText(messages[line].slice(0, index));
                 timer = setTimeout(typeLetter, typingSpeed);
             }
             else {
@@ -104,7 +138,7 @@
         function startDialogue() {
             clearTimeout(timer);
             index = 0;
-            text.textContent = "";
+            renderText("");
             typeLetter();
         }
 
@@ -113,7 +147,8 @@
 
             if (index < messages[line].length) {
                 clearTimeout(timer);
-                text.textContent = messages[line];
+                renderText(messages[line]); 
+                done = true;
                 index = messages[line].length;
             } else {
                 startDialogue();
