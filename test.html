@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Undertale Dialogue</title>
+
+<style>
+    @font-face {
+        font-family: "Determination Mono";
+        src: url("https://cartr.gitlab.io/undertale-fonts/webfonts/determinationmonoweb-webfont.woff2")
+             format("woff2");
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+        background: #111;
+    }
+
+    .dialogue-box {
+        
+        position: fixed;
+        bottom: 16px;
+        left: 50%;
+        transform: translateX(-50%);
+
+        width: min(90vw, 1200px);
+        aspect-ratio: 578 / 152;
+        container-type: inline-size;
+
+        border: 6px solid white;
+        background: black;
+        color: white;
+
+        display: flex;
+        align-items: flex-start;
+        padding: min(3vw, 40px);
+        gap: min(3vw, 40px);
+        
+        font-family: "Determination Mono", monospace;
+    }
+
+    .asterisk,
+    #text {
+        font-size: clamp(16px, 5.54cqw, 67px);
+        line-height: 1.25;
+    }
+
+    .asterisk {
+        flex-shrink: 0;
+    }
+
+    #text {
+        min-width: 0;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+    .dialogue-box {
+    visibility: hidden;
+}
+    
+</style>
+</head>
+
+<body>
+    <div class="dialogue-box">
+        <span class="asterisk">*</span>
+        <span id="text"></span>
+        
+    </div>
+    
+    
+    <script>
+        const messages = ["but it refused","hi","..."];
+        const typingSpeed = 55;
+        const text = document.getElementById("text");
+        const box = document.querySelector(".dialogue-box");
+        let index = 0;
+        let line = 2;
+        let timer;
+        let ready = false;
+        let done = false;
+
+
+        function typeLetter() {
+            if (index < messages[line].length) {
+                index++;
+                text.textContent = messages[line].slice(0, index);
+                timer = setTimeout(typeLetter, typingSpeed);
+            }
+            else {
+                console.log("done")
+                done = true;
+            }
+        }
+        function startDialogue() {
+            clearTimeout(timer);
+            index = 0;
+            text.textContent = "";
+            typeLetter();
+        }
+
+       box.addEventListener("click", function () {
+            if (!ready) return;
+
+            if (index < messages[line].length) {
+                clearTimeout(timer);
+                text.textContent = messages[line];
+                index = messages[line].length;
+            } else {
+                startDialogue();
+            }
+        });
+        function runText(){
+            done = false;
+            const delay = 3000; 
+            const wait = new Promise(resolve => setTimeout(resolve, delay));
+            const fontLoaded = document.fonts
+            .load('32px "Determination Mono"')
+            .catch(console.error);
+
+            Promise.all([wait, fontLoaded]).then(function () {
+                box.style.visibility = "visible";
+                ready = true;
+                startDialogue();
+            });}
+        window.addEventListener('load', () => {
+            runText()
+        });
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                if (done == true){
+                if (line == messages.length - 1) {
+                    line = 0;
+                }
+                else {
+                    line = line + 1;
+                }
+                
+                runText()
+                console.log("next")
+                console.log(line)
+                }
+            }
+        });
+    </script>
+</body>
+</html>
