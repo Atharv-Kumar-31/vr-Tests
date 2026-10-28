@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <script src="https://aframe.io/releases/1.0.0/aframe.min.js"></script>
-        <title>Howdy</title>
-        <style>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Undertale Dialogue</title>
+
+<style>
     @font-face {
         font-family: "Determination Mono";
         src: url("https://cartr.gitlab.io/undertale-fonts/webfonts/determinationmonoweb-webfont.woff2")
@@ -98,103 +100,9 @@
     min-width: 0;
 }
 </style>
-    </head>
-    <body>
-        <style>
-             @font-face {
-            font-family: "Determination Mono";
-            src: url("https://cartr.gitlab.io/undertale-fonts/webfonts/determinationmonoweb-webfont.woff2")
-                 format("woff2");
-            font-weight: normal;
-            font-style: normal;
-        }
+</head>
 
-        * {
-            box-sizing: border-box;
-        }
-                body {
-            margin: 0;
-            min-height: 100vh;
-            padding: 16px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #111;
-        }
-
-        .dialogue-box {
-            width: 640px;
-            max-width: 100%;
-            min-height: 160px;
-            padding: 20px 24px;
-            border: 6px solid white;
-            background: black;
-            color: white;
-            display: flex;
-            align-items: flex-start;
-            gap: 20px;
-            font-family: "Determination Mono", monospace;
-            font-size: 32px;
-            line-height: 1.25;
-            text-align: left;
-            cursor: pointer;
-        }
-
-        .asterisk {
-            flex-shrink: 0;
-        }
-
-        #text {
-            min-width: 0;
-            white-space: pre-wrap;
-            overflow-wrap: anywhere;
-        }
-        </style>
-        <a-scene>
-            <a-assets>
-                    <a-asset-item id="flowey" src="https://atharv-kumar-31.github.io/floweymodel/flowey/scene.gltf"></a-asset-item>
-
-            </a-assets>
-            <!-- Set the sky -->
-            <a-sky color = "black"></a-sky>
-            <a-gltf-model src="#flowey" position="0 1 -20" scale=".1 .1 .1" rotation = "0 0 0" animation = "
-            property: rotation;
-            from: 0 0 0;
-            to: 0 180 0;
-            dur: 10000"></a-gltf-model>
-            <a-plane color = "green" position = "0 0 0" rotation = "-90" height = "1000" width = "1000"></a-plane>
-
-            <!-- Stars 
-            <a-sphere color = "white" radius = "0.5" position = "">
-                
-            </a-sphere>
-            
-            <a-sphere>
-                
-            </a-sphere>
-            
-            <a-sphere>
-                
-            </a-sphere>
-            
-            <a-sphere>
-                
-            </a-sphere>
-            
-            <a-sphere>
-                
-            </a-sphere>
-            
-            <a-sphere>
-                
-            </a-sphere>
-           
-            -->
-        </a-scene>
-        <script>
-        // Change this to your own dialogue.
-    
-    </script>
+<body>
     <div class="dialogue-box">
         <img class="portrait" src="flowey.png" alt="Flowey">
         <div id="text"></div>
@@ -208,7 +116,7 @@
         const box = document.querySelector(".dialogue-box");
         let index = 0;
         let line = 0;
-        let delay = 10000; 
+        let delay = 30; 
         let timer;
         let ready = false;
         let done = false;
@@ -276,7 +184,7 @@
             runText()
         });
         document.addEventListener('keydown', function(event) {
-            if (event.key === 'Enter') {
+            if (event.key === 'Enter' || event.key === "z") {
                 delay = 0;
                 if (done == true){
                 if (line == messages.length - 1) {
@@ -293,6 +201,5 @@
             }
         });
     </script>
-    </body>
-    
+</body>
 </html>
