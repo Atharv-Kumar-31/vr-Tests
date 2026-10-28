@@ -154,6 +154,7 @@
         </style>
         <a-scene>
             <a-assets>
+
                 <a-asset-item
                         id="floweyAsset"
                         src="https://atharv-kumar-31.github.io/floweymodel/flowey/scene.gltf">
@@ -165,7 +166,23 @@
                         crossorigin="anonymous">
                     </audio>
             </a-assets>
-            <a-box id="ruinsWallBack"  position="5.24 5.31 -20" width="6.57" height="10.62" depth="1" material="color: white;
+            <a-entity
+                    id="rig"
+                    position="0 0 0"
+                    movement-controls
+                    kinematic-body>
+
+                <a-entity
+                        id="camera"
+                        camera
+                        position="0 1.6 0"
+                        look-controls
+                        sphere-collider="objects: .bullet; radius: 0.3"
+                        geometry="primitive: sphere; radius: 0.3"
+                        material="visible: false">
+                </a-entity>
+            </a-entity>
+            <a-box static-body id="ruinsWallBack"  position="5.24 5.31 -20" width="6.57" height="1000" depth="1" material="color: white;
               src: https://atharv-kumar-31.github.io/vr-Tests/ruins.png;
               repeat: 3.285 5.35434;
               offset: 0.24 0">
@@ -177,7 +194,7 @@
               offset: 0.285 0.11754">
             </a-box>
 
-            <a-box id="ruinsWallBack-3"  position="-5.24 5.31 -20" width="6.57" height="10.62" depth="1" material="color: white;
+            <a-box static-body id="ruinsWallBack-3"  position="-5.24 5.31 -20" width="6.57" height="1000" depth="1" material="color: white;
                 src: https://atharv-kumar-31.github.io/vr-Tests/ruins.png;
                 repeat: 3.285 5.35434;
                 offset: 0 0">
