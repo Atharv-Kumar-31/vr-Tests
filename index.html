@@ -153,7 +153,12 @@
         <a-scene>
             <a-assets>
                     <a-asset-item id="flowey" src="https://atharv-kumar-31.github.io/floweymodel/flowey/scene.gltf"></a-asset-item>
-
+                    <audio
+                        id="bestFriend"
+                        src="https://codehs.com/uploads/2417eec7d5641e154dfdcc4435f3d84c"
+                        preload="auto"
+                        crossorigin="anonymous">
+                    </audio>
             </a-assets>
             <!-- Set the sky -->
             <a-sky color = "black"></a-sky>
@@ -163,7 +168,16 @@
             to: 0 180 0;
             dur: 10000"></a-gltf-model>
             <a-plane color = "green" position = "0 0 0" rotation = "-90" height = "1000" width = "1000"></a-plane>
-
+            <a-entity
+                id="soundSource"
+                position="0 1 -20"
+                sound="src: #bestFriend;
+                autoplay: true;
+                loop: true;
+                positional: true;
+                refDistance: 2;
+                rolloffFactor: 1">
+            </a-entity>
             <!-- Stars 
             <a-sphere color = "white" radius = "0.5" position = "">
                 
@@ -202,6 +216,7 @@
     
     
     <script>
+
         const messages = ["Howdy\nI'm FLOWEY.\nFLOWEY the FLOWER","Hmmm...","You're new to the UNDERGROUND, aren'tcha", "Golly, you must be so confused.","Someone ought to teach you how things work around here!", "I guess little old me will have to do.", "Ready?\nHere we go!"];
         const typingSpeed = 55;
         const text = document.getElementById("text");
@@ -212,8 +227,15 @@
         let timer;
         let ready = false;
         let done = false;
-        function renderText(value) {
-            text.replaceChildren();
+        window.addEventListener("click", function () {
+        const source = document.querySelector("#soundSource");
+
+            if (source && source.components.sound) {
+                    source.components.sound.playSound();
+            }
+        }, { once: true });
+            function renderText(value) {
+                text.replaceChildren();
 
             value.split("\n").forEach(function (part) {
                 const row = document.createElement("div");
@@ -270,112 +292,12 @@
             Promise.all([wait, fontLoaded]).then(function () {
                 box.style.visibility = "visible";
                 ready = true;
-                startDialogue();<!DOCTYPE html>
-<html>
-    <head>
-        <script src="https://aframe.io/releases/1.0.0/aframe.min.js"></script>
-        <title>Flung into Space</title>
-    </head>
-    <body>
-        <style>
-             @font-face {
-            font-family: "Determination Mono";
-            src: url("https://cartr.gitlab.io/undertale-fonts/webfonts/determinationmonoweb-webfont.woff2")
-                 format("woff2");
-            font-weight: normal;
-            font-style: normal;
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-                body {
-            margin: 0;
-            min-height: 100vh;
-            padding: 16px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #111;
-        }
-
-        .dialogue-box {
-            width: 640px;
-            max-width: 100%;
-            min-height: 160px;
-            padding: 20px 24px;
-            border: 6px solid white;
-            background: black;
-            color: white;
-            display: flex;
-            align-items: flex-start;
-            gap: 20px;
-            font-family: "Determination Mono", monospace;
-            font-size: 32px;
-            line-height: 1.25;
-            text-align: left;
-            cursor: pointer;
-        }
-
-        .asterisk {
-            flex-shrink: 0;
-        }
-
-        #text {
-            min-width: 0;
-            white-space: pre-wrap;
-            overflow-wrap: anywhere;
-        }
-        </style>
-        <a-scene>
-            <a-assets>
-                    <a-asset-item id="flowey" src="https://atharv-kumar-31.github.io/floweymodel/flowey/scene.gltf"></a-asset-item>
-
-            </a-assets>
-            <!-- Set the sky -->
-            <a-sky color = "black"></a-sky>
-            <a-gltf-model src="#flowey" position="0 1 -20" scale=".1 .1 .1" rotation = "0 0 0" animation = "
-            property: rotation;
-            from: 0 0 0;
-            to: 0 180 0;
-            dur: 10000"></a-gltf-model>
-            <a-plane color = "green" position = "0 0 0" rotation = "-90" height = "1000" width = "1000"></a-plane>
-
-            <!-- Stars 
-            <a-sphere color = "white" radius = "0.5" position = "">
-                
-            </a-sphere>
-            
-            <a-sphere>
-                
-            </a-sphere>
-            
-            <a-sphere>
-                
-            </a-sphere>
-            
-            <a-sphere>
-                
-            </a-sphere>
-            
-            <a-sphere>
-                
-            </a-sphere>
-            
-            <a-sphere>
-                
-            </a-sphere>
-           
-            -->
-        </a-scene>
-        
-    </script>
-    </body>
-    
-</html>
+                startDialogue();
             });}
         window.addEventListener('load', () => {
+            
             runText()
+            
         });
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Enter' || event.key === 'z') {
