@@ -184,35 +184,36 @@
             </a-entity>
             <a-box static-body id="ruinsWallBack"  position="5.24 5.31 -20" width="6.57" height="1000" depth="1" material="color: white;
               src: https://atharv-kumar-31.github.io/vr-Tests/ruins.png;
-              repeat: 3.285 5.35434;
+              repeat: 3.285 504.175141243;
               offset: 0.24 0">
             </a-box>
 
-            <a-box id="ruinsWallBack-2" position="0 7.41 -20" width="3.91" height="6.42" depth="1" material="color: white;
+            <a-box static-body id="ruinsWallBack-2"   position="0 504.39 -20" width="3.91" height="1000" depth="1" material="color: white;
               src: https://atharv-kumar-31.github.io/vr-Tests/ruins.png;
-              repeat: 1.955 3.23681;
+              repeat: 1.955 504.176012461;
               offset: 0.285 0.11754">
             </a-box>
 
             <a-box static-body id="ruinsWallBack-3"  position="-5.24 5.31 -20" width="6.57" height="1000" depth="1" material="color: white;
                 src: https://atharv-kumar-31.github.io/vr-Tests/ruins.png;
-                repeat: 3.285 5.35434;
+                repeat: 3.285 504.175141243;
                 offset: 0 0">
 
             </a-box>
-            <a-box id="ruinsWallBack-4" position="-11.24568 5.31 -20" width="6.57" height="10.62" depth="1" material="color: white;
+            <a-box static-body id="ruinsWallBack-4" position="-11.24568 5.31 -20" width="6.57" height="1000" depth="1" material="color: white;
                 src: https://atharv-kumar-31.github.io/vr-Tests/ruins.png;
-                repeat: 3.285 5.35434;
+                repeat: 3.285 504.175141243;
                 offset: 0 0">
             </a-box>
-            <a-box id="ruinsWallBack-5" position="11.22943 5.31 -20" width="6.57" height="10.62" depth="1" material="color: white;
+            <a-box static-body id="ruinsWallBack-5" position="11.22943 5.31 -20" width="6.57" height="1000" depth="1" material="color: white;
               src: https://atharv-kumar-31.github.io/vr-Tests/ruins.png;
-              repeat: 3.285 5.35434;
+              repeat: 3.285 504.175141243;
               offset: 0.24 0">
             </a-box>
             <!-- Set the sky -->
             <a-sky color = "black"></a-sky>
             <a-gltf-model
+                    static-body
                     id="flowey"
                     src="#floweyAsset"
                     position="0 0.02192 -12.32248"
@@ -226,7 +227,7 @@
             from: 0 0 0;
             to: 0 180 0;
             dur: 10000"></a-gltf-model>
-            <a-plane color = "green" position = "0 0 0" rotation = "-90" height = "1000" width = "1000"></a-plane>
+            <a-plane static-body color = "green" position = "0 0 0" rotation = "-90" height = "1000" width = "1000"></a-plane>
             <a-entity
                 id="soundSource"
                 position="0 1 -20"
@@ -238,38 +239,9 @@
                 rolloffFactor: 1">
             </a-entity>
             <a-sphere radius = "10" position = "0 -9.8 0" src="https://atharv-kumar-31.github.io/vr-Tests/flowers.jpg" repeat = "10 10" rotation = "0 90 0"></a-sphere>
-            <!-- Stars 
-            <a-sphere color = "white" radius = "0.5" position = "">
-            
-                
-            </a-sphere>
-            
-            <a-sphere>
-                
-            </a-sphere>
-            
-            <a-sphere>
-                
-            </a-sphere>
-            
-            <a-sphere>
-                
-            </a-sphere>
-            
-            <a-sphere>
-                
-            </a-sphere>
-            
-            <a-sphere>
-                
-            </a-sphere>
-           
-            -->
+            <a-sphere class = "bullet" position = "0 2 -5"></a-sphere>
+
         </a-scene>
-        <script>
-        // Change this to your own dialogue.
-    
-    </script>
     <div class="dialogue-box">
         <img class="portrait" src="flowey.png" alt="Flowey">
         <div id="text"></div>
@@ -277,16 +249,19 @@
     
     
     <script>
-
+        const bullet = document.querySelector(".bullet");
+        const scene = document.querySelector("a-scene");
+        const camera = document.querySelector("#camera");
         const messages = ["Howdy\nI'm FLOWEY.\nFLOWEY the FLOWER","Hmmm...","You're new to the UNDERGROUND, aren'tcha", "Golly, you must be so confused.","Someone ought to teach you how things work around here!", "I guess little old me will have to do.", "Ready?\nHere we go!"];
         const typingSpeed = 55;
         const text = document.getElementById("text");
         const box = document.querySelector(".dialogue-box");
         let index = 0;
         let line = 0;
+        let collisionReady = false;
         let delay = 10000; 
         let timer;
-        let ready = false;
+        let textReady = false;
         let done = false;
         window.addEventListener("click", function () {
         const source = document.querySelector("#soundSource");
@@ -333,7 +308,7 @@
 
        box.addEventListener("click", function () {
     document.addEventListener('keydown', function(event) {
-            if (!ready) return;
+            if (!textReady) return;
 
             if (index < messages[line].length && event.key === 'Shift'||index < messages[line].length && event.key === 'x') {
                 clearTimeout(timer);
