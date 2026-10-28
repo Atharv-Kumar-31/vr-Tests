@@ -86,13 +86,26 @@
     white-space: pre-wrap;
     overflow-wrap: anywhere;
 }
+.portrait {
+    width: 16%;
+    height: auto;
+    flex-shrink: 0;
+    align-self: flex-start;
+    image-rendering: pixelated;
+}
+
+#text {
+    flex: 1;
+    width: auto;
+    min-width: 0;
+}
 </style>
 </head>
 
 <body>
     <div class="dialogue-box">
-       <div id="text"></div>
-        
+        <img class="portrait" src="flowey.png" alt="Flowey">
+        <div id="text"></div>
     </div>
     
     
