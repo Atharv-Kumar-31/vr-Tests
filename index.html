@@ -1,173 +1,243 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<html>
+    <head>
+        <script src="https://aframe.io/releases/1.0.0/aframe.min.js"></script>
+        <title>Flung into Space</title>
+        <style>
+    @font-face {
+        font-family: "Determination Mono";
+        src: url("https://cartr.gitlab.io/undertale-fonts/webfonts/determinationmonoweb-webfont.woff2")
+             format("woff2");
+        font-weight: normal;
+        font-style: normal;
+    }
 
-    <script src="https://aframe.io/releases/1.0.0/aframe.min.js"></script>
+    * {
+        box-sizing: border-box;
+    }
 
-    <title>update</title>
+    body {
+        margin: 0;
+        min-height: 100vh;
+        background: #111;
+    }
 
-    <style>
-        @font-face {
+    .dialogue-box {
+        
+        position: fixed;
+        bottom: 16px;
+        left: 50%;
+        transform: translateX(-50%);
+
+        width: min(90vw, 1200px);
+        aspect-ratio: 578 / 152;
+        container-type: inline-size;
+
+        border: 6px solid white;
+        background: black;
+        color: white;
+
+        display: flex;
+        align-items: flex-start;
+        padding: min(3vw, 40px);
+        gap: min(3vw, 40px);
+        
+        font-family: "Determination Mono", monospace;
+    }
+
+    .asterisk,
+    #text {
+        font-size: clamp(16px, 5.54cqw, 67px);
+        line-height: 1.25;
+    }
+
+    .asterisk {
+        flex-shrink: 0;
+    }
+
+    #text {
+        min-width: 0;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+    .dialogue-box {
+    visibility: hidden;
+}
+    #text {
+    width: 100%;
+    white-space: normal;
+}
+
+.dialogue-line {
+    display: flex;
+    gap: 0.6em;
+    align-items: flex-start;
+}
+
+.dialogue-line::before {
+    content: "*";
+    flex-shrink: 0;
+}
+
+.line-content {
+    min-width: 0;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+.portrait {
+    width: 16%;
+    height: auto;
+    flex-shrink: 0;
+    align-self: flex-start;
+    image-rendering: pixelated;
+}
+
+#text {
+    flex: 1;
+    width: auto;
+    min-width: 0;
+}
+</style>
+    </head>
+    <body>
+        <style>
+             @font-face {
             font-family: "Determination Mono";
             src: url("https://cartr.gitlab.io/undertale-fonts/webfonts/determinationmonoweb-webfont.woff2")
                  format("woff2");
+            font-weight: normal;
+            font-style: normal;
         }
 
         * {
             box-sizing: border-box;
         }
-
-        body {
+                body {
             margin: 0;
+            min-height: 100vh;
+            padding: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             background: #111;
         }
 
         .dialogue-box {
-            visibility: hidden;
-            position: fixed;
-            bottom: 16px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 10;
-
-            width: min(90vw, 1200px);
-            aspect-ratio: 578 / 152;
-            container-type: inline-size;
-
+            width: 640px;
+            max-width: 100%;
+            min-height: 160px;
+            padding: 20px 24px;
             border: 6px solid white;
             background: black;
             color: white;
-
             display: flex;
             align-items: flex-start;
-            padding: min(3vw, 40px);
-            gap: min(3vw, 40px);
-
+            gap: 20px;
             font-family: "Determination Mono", monospace;
+            font-size: 32px;
+            line-height: 1.25;
+            text-align: left;
+            cursor: pointer;
         }
 
-        .portrait {
-            width: 16%;
-            height: auto;
+        .asterisk {
             flex-shrink: 0;
-            image-rendering: pixelated;
         }
 
         #text {
-            flex: 1;
-            min-width: 0;
-            font-size: clamp(16px, 5.54cqw, 67px);
-            line-height: 1.25;
-        }
-
-        .dialogue-line {
-            display: flex;
-            align-items: flex-start;
-            gap: 0.6em;
-        }
-
-        .dialogue-line::before {
-            content: "*";
-            flex-shrink: 0;
-        }
-
-        .line-content {
             min-width: 0;
             white-space: pre-wrap;
             overflow-wrap: anywhere;
         }
-    </style>
-</head>
-
-<body>
-    <!-- Background music: starts after a click or keypress. -->
-    <audio id="bestFriend" src="flowey.mp3" preload="auto" loop></audio>
-
-    <a-scene>
-        <a-assets>
-            <a-asset-item
-                id="flowey"
-                src="https://atharv-kumar-31.github.io/floweymodel/flowey/scene.gltf">
-            </a-asset-item>
-        </a-assets>
-
-        <a-sky color="black"></a-sky>
-
-        <a-gltf-model
-            src="#flowey"
-            position="0 1 -20"
-            scale="0.1 0.1 0.1"
-            rotation="0 0 0"
-            animation="property: rotation;
-                       from: 0 0 0;
-                       to: 0 180 0;
-                       dur: 10000">
-        </a-gltf-model>
-
-        <a-plane
-            color="green"
-            position="0 0 0"
-            rotation="-90 0 0"
-            height="1000"
-            width="1000">
-        </a-plane>
-    </a-scene>
-
+        </style>
+        <a-scene>
+            <a-assets>
+                    <a-asset-item id="flowey" src="https://atharv-kumar-31.github.io/floweymodel/flowey/scene.gltf"></a-asset-item>
+                    <audio
+                        id="bestFriend"
+                        src="https://codehs.com/uploads/2417eec7d5641e154dfdcc4435f3d84c"
+                        preload="auto"
+                        crossorigin="anonymous">
+                    </audio>
+            </a-assets>
+            <!-- Set the sky -->
+            <a-sky color = "black"></a-sky>
+            <a-gltf-model src="#flowey" position="0 1 -20" scale=".1 .1 .1" rotation = "0 0 0" animation = "
+            property: rotation;
+            from: 0 0 0;
+            to: 0 180 0;
+            dur: 10000"></a-gltf-model>
+            <a-plane color = "green" position = "0 0 0" rotation = "-90" height = "1000" width = "1000"></a-plane>
+            <a-entity
+                id="soundSource"
+                position="0 1 -20"
+                sound="src: #bestFriend;
+                autoplay: true;
+                loop: true;
+                positional: true;
+                refDistance: 2;
+                rolloffFactor: 1">
+            </a-entity>
+            <a-sphere radius = "50" position = "0 -49 0" src="https://atharv-kumar-31.github.io/vr-Tests/flowers.jpg" repeat = "100 100"></a-sphere>
+            <!-- Stars 
+            <a-sphere color = "white" radius = "0.5" position = "">
+            
+                
+            </a-sphere>
+            
+            <a-sphere>
+                
+            </a-sphere>
+            
+            <a-sphere>
+                
+            </a-sphere>
+            
+            <a-sphere>
+                
+            </a-sphere>
+            
+            <a-sphere>
+                
+            </a-sphere>
+            
+            <a-sphere>
+                
+            </a-sphere>
+           
+            -->
+        </a-scene>
+        <script>
+        // Change this to your own dialogue.
+    
+    </script>
     <div class="dialogue-box">
         <img class="portrait" src="flowey.png" alt="Flowey">
         <div id="text"></div>
     </div>
-
+    
+    
     <script>
-        const messages = [
-            "Howdy\nI'm FLOWEY.\nFLOWEY the FLOWER",
-            "Hmmm...",
-            "You're new to the UNDERGROUND, aren'tcha",
-            "Golly, you must be so confused.",
-            "Someone ought to teach you how things work around here!",
-            "I guess little old me will have to do.",
-            "Ready?\nHere we go!"
-        ];
 
+        const messages = ["Howdy\nI'm FLOWEY.\nFLOWEY the FLOWER","Hmmm...","You're new to the UNDERGROUND, aren'tcha", "Golly, you must be so confused.","Someone ought to teach you how things work around here!", "I guess little old me will have to do.", "Ready?\nHere we go!"];
         const typingSpeed = 55;
-        const delay = 10000;
-
         const text = document.getElementById("text");
         const box = document.querySelector(".dialogue-box");
-        const music = document.getElementById("bestFriend");
-
         let index = 0;
         let line = 0;
+        let delay = 10000; 
         let timer;
         let ready = false;
         let done = false;
-        let musicStarting = false;
+        window.addEventListener("click", function () {
+        const source = document.querySelector("#soundSource");
 
-        // MUSIC
-        music.volume = 0.5;
-
-        async function startMusic() {
-            if (!music.paused || musicStarting) return;
-
-            musicStarting = true;
-
-            try {
-                await music.play();
-            } catch (error) {
-                console.error("Music failed:", error);
-            } finally {
-                musicStarting = false;
+            if (source && source.components.sound) {
+                    source.components.sound.playSound();
             }
-        }
-
-        window.addEventListener("click", startMusic);
-        window.addEventListener("keydown", startMusic);
-
-        // DIALOGUE
-        function renderText(value) {
-            text.replaceChildren();
+        }, { once: true });
+            function renderText(value) {
+                text.replaceChildren();
 
             value.split("\n").forEach(function (part) {
                 const row = document.createElement("div");
@@ -183,69 +253,73 @@
         }
 
         function typeLetter() {
-            const message = messages[line];
-
-            if (index < message.length) {
+            
+            if (index < messages[line].length) {
                 index++;
-                renderText(message.slice(0, index));
-            }
-
-            if (index < message.length) {
+                renderText(messages[line].slice(0, index));
                 timer = setTimeout(typeLetter, typingSpeed);
-            } else {
+            }
+            else {
+                console.log("done")
                 done = true;
             }
         }
-
         function startDialogue() {
             clearTimeout(timer);
             index = 0;
-            done = false;
             renderText("");
             typeLetter();
         }
 
-        function advanceDialogue() {
+       box.addEventListener("click", function () {
+    document.addEventListener('keydown', function(event) {
             if (!ready) return;
 
-            if (!done) {
+            if (index < messages[line].length && event.key === 'Shift'||index < messages[line].length && event.key === 'x') {
                 clearTimeout(timer);
-                index = messages[line].length;
-                renderText(messages[line]);
+                renderText(messages[line]); 
                 done = true;
+                index = messages[line].length;
             } else {
-                line = (line + 1) % messages.length;
-                startDialogue();
+               // startDialogue();
             }
-        }
-
-        box.addEventListener("click", advanceDialogue);
-
-        document.addEventListener("keydown", function (event) {
-            if (
-                (event.key === "Enter" ||
-                 event.key() === "z") &&
-                !event.repeat
-            ) {
-                event.preventDefault();
-                advanceDialogue();
-            }
-        });
-
-        // Delay only the first dialogue page.
-        const wait = new Promise(function (resolve) {
-            setTimeout(resolve, delay);
-        });
-
-        const fontLoaded = document.fonts
+        });});
+        function runText(){
+            done = false;
+            
+            const wait = new Promise(resolve => setTimeout(resolve, delay));
+            const fontLoaded = document.fonts
             .load('32px "Determination Mono"')
             .catch(console.error);
 
-        Promise.all([wait, fontLoaded]).then(function () {
-            box.style.visibility = "visible";
-            ready = true;
-            startDialogue();
+            Promise.all([wait, fontLoaded]).then(function () {
+                box.style.visibility = "visible";
+                ready = true;
+                startDialogue();
+            });}
+        window.addEventListener('load', () => {
+            
+            runText()
+            
+        });
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' || event.key === 'z') {
+                delay = 0;
+                if (done == true){
+                if (line == messages.length - 1) {
+                    line = 0;
+                }
+                else {
+                    line = line + 1;
+                }
+                
+                runText()
+                console.log("next")
+                console.log(line)
+                }
+            }
         });
     </script>
-</body>
+    </body>
+    
 </html>
