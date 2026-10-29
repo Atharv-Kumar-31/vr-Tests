@@ -182,51 +182,48 @@
                         material="visible: false">
                 </a-entity>
             </a-entity>
-            <a-box static-body id="ruinsWallBack"  position="5.24 5.31 -20" width="6.57" height="1000" depth="1" material="color: white;
+            <!--https://docs.google.com/document/d/1S6Z4qRBESS6_yT4wYpnRu9BOk0egSdM2Abugt6LGooQ/edit?tab=t.0-->
+            <a-box static-body id="ruinsWallBack"   static-body="sphereRadius: NaN"  position="5.24 5.31 -20" width="6.57" height="5000" depth="1" material="color: white;
               src: https://atharv-kumar-31.github.io/vr-Tests/ruins.png;
-              repeat: 3.285 504.175141243;
+              repeat: 3.285 2520.87570621;
               offset: 0.24 0">
             </a-box>
 
-            <a-box static-body id="ruinsWallBack-2"   position="0 504.39 -20" width="3.91" height="1000" depth="1" material="color: white;
+            <a-box static-body id="ruinsWallBack-2" static-body="sphereRadius: NaN"   position="0 2506.65 -20" width="3.91" height="5000" depth="1" material="color: white;
               src: https://atharv-kumar-31.github.io/vr-Tests/ruins.png;
-              repeat: 1.955 504.176012461;
+              repeat: 1.955 2520.87570621;
               offset: 0.285 0.11754">
             </a-box>
 
-            <a-box static-body id="ruinsWallBack-3"  position="-5.24 5.31 -20" width="6.57" height="1000" depth="1" material="color: white;
+            <a-box static-body id="ruinsWallBack-3"  position="-5.24 5.31 -20" width="6.57" height="5000" depth="1" material="color: white;
                 src: https://atharv-kumar-31.github.io/vr-Tests/ruins.png;
-                repeat: 3.285 504.175141243;
+                repeat: 3.285 2520.87570621;
                 offset: 0 0">
 
             </a-box>
-            <a-box static-body id="ruinsWallBack-4" position="-11.24568 5.31 -20" width="6.57" height="1000" depth="1" material="color: white;
+            <a-box static-body id="ruinsWallBack-4" position="-11.24568 5.31 -20" width="6.57" height="5000" depth="1" material="color: white;
                 src: https://atharv-kumar-31.github.io/vr-Tests/ruins.png;
-                repeat: 3.285 504.175141243;
+                repeat: 3.285 2520.87570621;
                 offset: 0 0">
             </a-box>
-            <a-box static-body id="ruinsWallBack-5" position="11.22943 5.31 -20" width="6.57" height="1000" depth="1" material="color: white;
+            <a-box static-body id="ruinsWallBack-5" position="11.22943 5.31 -20" width="6.57" height="5000" depth="1" material="color: white;
               src: https://atharv-kumar-31.github.io/vr-Tests/ruins.png;
-              repeat: 3.285 504.175141243;
+              repeat: 3.285 2520.87570621;
               offset: 0.24 0">
             </a-box>
-            <!-- Set the sky -->
-            <a-sky color = "black"></a-sky>
+            <a-box static-body id="leftWall" material="src: https://atharv-kumar-31.github.io/vr-Tests/ruins.png; repeat: 25.0381097561 2479.2971675"  position="-14.53 0.21 5.37" rotation="0 90 0" geometry="width: 50; depth: 1; height: 5000;"></a-box>
             <a-gltf-model
                     static-body
                     id="flowey"
                     src="#floweyAsset"
                     position="0 0.02192 -12.32248"
                     scale="0.1 0.1 0.1"
-                    rotation="0 0 0"
+                    rotation="0 7.595151381978188 0"
                     animation="property: rotation;
                from: 0 0 0;
                to: 0 180 0;
                dur: 10000">
-            </a-gltf-model>            property: rotation;
-            from: 0 0 0;
-            to: 0 180 0;
-            dur: 10000"></a-gltf-model>
+            </a-gltf-model>
             <a-plane static-body color = "green" position = "0 0 0" rotation = "-90" height = "1000" width = "1000"></a-plane>
             <a-entity
                 id="soundSource"
@@ -239,7 +236,7 @@
                 rolloffFactor: 1">
             </a-entity>
             <a-sphere radius = "10" position = "0 -9.8 0" src="https://atharv-kumar-31.github.io/vr-Tests/flowers.jpg" repeat = "10 10" rotation = "0 90 0"></a-sphere>
-            <a-sphere class = "bullet" position = "0 2 -5"></a-sphere>
+            <a-sphere class = "bullet" id = "pellet" position = "0 2 -5" material = "visible: false;" animation = "property:"></a-sphere>
 
         </a-scene>
     <div class="dialogue-box">
@@ -250,9 +247,8 @@
     
     <script>
         const bullet = document.querySelector(".bullet");
-        const scene = document.querySelector("a-scene");
         const camera = document.querySelector("#camera");
-        const messages = ["Howdy\nI'm FLOWEY.\nFLOWEY the FLOWER","Hmmm...","You're new to the UNDERGROUND, aren'tcha", "Golly, you must be so confused.","Someone ought to teach you how things work around here!", "I guess little old me will have to do.", "Ready?\nHere we go!"];
+        const messages = ["Howdy!\nI'm [y]FLOWEY[/y].\n[y]FLOWEY[/y] the [y]FLOWER[/y]!","Hmmm...","You're new to the UNDERGROUND, aren'tcha?", "Golly, you must be so confused.","Someone ought to teach you how things work around here!", "I guess little old me will have to do.", "Ready?\nHere we go!"];
         const typingSpeed = 55;
         const text = document.getElementById("text");
         const box = document.querySelector(".dialogue-box");
@@ -270,33 +266,71 @@
                     source.components.sound.playSound();
             }
         }, { once: true });
-            function renderText(value) {
-                text.replaceChildren();
+        function renderText(value, limit = Infinity) {
+            text.replaceChildren();
 
-            value.split("\n").forEach(function (part) {
+            let y = false;
+            let count = 0;
+            let content;
+
+            function newRow() {
                 const row = document.createElement("div");
                 row.className = "dialogue-line";
 
-                const content = document.createElement("span");
+                content = document.createElement("span");
                 content.className = "line-content";
-                content.textContent = part;
 
                 row.appendChild(content);
                 text.appendChild(row);
-            });
+            }
+
+            newRow();
+
+            const parts = value.split(/(\[y\]|\[\/y\]|\n)/);
+
+            for (const part of parts) {
+                if (part === "[y]") {
+                    y = true;
+                } else if (part === "[/y]") {
+                    y = false;
+                } else if (part === "\n") {
+                    if (count >= limit) break;
+                    count++;
+                    newRow();
+                } else {
+                    const remaining = Math.max(0, limit - count);
+                    const visible = part.slice(0, remaining);
+
+                    if (visible) {
+                        const span = document.createElement("span");
+                        span.style.color = y ? "#ffff00" : "#ffffff";
+                        span.textContent = visible;
+                        content.appendChild(span);
+                        count += visible.length;
+                    }
+
+                    if (visible.length < part.length) break;
+                }
+            }
         }
 
 
+
+
         function typeLetter() {
-            
-            if (index < messages[line].length) {
+            const message = messages[line];
+            const plainText = message.replace(/\[\/?y\]/g, "");
+
+            if (index < plainText.length) {
                 index++;
-                renderText(messages[line].slice(0, index));
-                timer = setTimeout(typeLetter, typingSpeed);
+                renderText(message, index);
             }
-            else {
-                console.log("done")
+
+            if (index < plainText.length) {
+                timer = setTimeout(typeLetter, typingSpeed);
+            } else {
                 done = true;
+                console.log("donezo");
             }
         }
         function startDialogue() {
@@ -371,6 +405,9 @@
         camera.addEventListener("hitend", function (event) {
             console.log("Done:", event.detail.el);
         });
+        function shoot(){
+
+        }
     </script>
     </body>
     
