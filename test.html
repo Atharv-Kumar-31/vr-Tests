@@ -3,155 +3,598 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Undertale Dialogue</title>
 
-<style>
-    @font-face {
-        font-family: "Determination Mono";
-        src: url("https://cartr.gitlab.io/undertale-fonts/webfonts/determinationmonoweb-webfont.woff2")
-             format("woff2");
-        font-weight: normal;
-        font-style: normal;
-    }
+    <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aframe-physics-system@4.0.1/dist/aframe-physics-system.min.js"></script>
 
-    * {
-        box-sizing: border-box;
-    }
+    <title>Flung into Space</title>
 
-    body {
-        margin: 0;
-        min-height: 100vh;
-        background: #111;
-    }
+    <style>
+        @font-face {
+            font-family: "Determination Mono";
+            src: url("https://cartr.gitlab.io/undertale-fonts/webfonts/determinationmonoweb-webfont.woff2")
+            format("woff2");
+            font-weight: normal;
+            font-style: normal;
+        }
 
-    .dialogue-box {
-        
-        position: fixed;
-        bottom: 16px;
-        left: 50%;
-        transform: translateX(-50%);
+        * {
+            box-sizing: border-box;
+        }
 
-        width: min(90vw, 1200px);
-        aspect-ratio: 578 / 152;
-        container-type: inline-size;
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #111;
+        }
 
-        border: 6px solid white;
-        background: black;
-        color: white;
+        .dialogue-box {
+            visibility: hidden;
+            position: fixed;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
 
-        display: flex;
-        align-items: flex-start;
-        padding: min(3vw, 40px);
-        gap: min(3vw, 40px);
-        
-        font-family: "Determination Mono", monospace;
-    }
+            width: 640px;
+            max-width: 90vw;
+            min-height: 160px;
+            aspect-ratio: 578 / 152;
+            container-type: inline-size;
 
-    .asterisk,
-    #text {
-        font-size: clamp(16px, 5.54cqw, 67px);
-        line-height: 1.25;
-    }
+            display: flex;
+            align-items: flex-start;
+            padding: 20px 24px;
+            gap: 20px;
 
-    .asterisk {
-        flex-shrink: 0;
-    }
+            border: 6px solid white;
+            background: black;
+            color: white;
+            font-family: "Determination Mono", monospace;
+        }
 
-    #text {
-        min-width: 0;
-        white-space: pre-wrap;
-        overflow-wrap: anywhere;
-    }
-    .dialogue-box {
-    visibility: hidden;
-}
-    
-</style>
+        .portrait {
+            width: 16%;
+            height: auto;
+            flex-shrink: 0;
+            image-rendering: pixelated;
+        }
+
+        #text {
+            flex: 1;
+            min-width: 0;
+            font-size: clamp(16px, 5.54cqw, 67px);
+            line-height: 1.25;
+        }
+
+        .dialogue-line {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.6em;
+        }
+
+        .dialogue-line::before {
+            content: "*";
+            flex-shrink: 0;
+        }
+
+        .line-content {
+            min-width: 0;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        body.in-vr .dialogue-box {
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="dialogue-box">
-        <span class="asterisk">*</span>
-        <span id="text"></span>
-        
-    </div>
-    
-    
-    <script>
-        const messages = ["but it refused","hi","..."];
-        const typingSpeed = 55;
-        const text = document.getElementById("text");
-        const box = document.querySelector(".dialogue-box");
-        let index = 0;
-        let line = 2;
-        let delay = 3000; 
-        let timer;
-        let ready = false;
-        let done = false;
+<a-scene>
+    <a-assets>
+        <canvas
+                id="dialogueCanvas"
+                width="1024"
+                height="288">
+        </canvas>
 
+        <a-asset-item
+                id="floweyAsset"
+                src="https://atharv-kumar-31.github.io/floweymodel/flowey/scene.gltf">
+        </a-asset-item>
 
-        function typeLetter() {
-            if (index < messages[line].length) {
-                index++;
-                text.textContent = messages[line].slice(0, index);
-                timer = setTimeout(typeLetter, typingSpeed);
-            }
-            else {
-                console.log("done")
-                done = true;
-            }
+        <audio
+                id="bestFriend"
+                src="https://codehs.com/uploads/2417eec7d5641e154dfdcc4435f3d84c"
+                preload="auto"
+                crossorigin="anonymous">
+        </audio>
+    </a-assets>
+
+    <a-entity
+            id="rig"
+            position="0 0 0"
+            movement-controls
+            kinematic-body>
+
+        <a-entity
+                id="camera"
+                camera
+                position="0 1.6 0"
+                look-controls
+                sphere-collider="objects: .bullet; radius: 0.3"
+                geometry="primitive: sphere; radius: 0.3"
+                material="visible: false">
+
+            <a-plane
+                    id="vrDialogue"
+                    class="dialogue-target"
+                    position="0 -0.45 -1.5"
+                    width="1.8"
+                    height="0.50625"
+                    visible="false"
+                    material="shader: flat;
+                              src: #dialogueCanvas;
+                              side: double">
+            </a-plane>
+        </a-entity>
+
+        <a-entity
+                laser-controls="hand: right"
+                raycaster="objects: .dialogue-target">
+        </a-entity>
+    </a-entity>
+
+    <a-box
+            static-body
+            id="ruinsWallBack"
+            position="5.24 5.31 -20"
+            width="6.57"
+            height="5000"
+            depth="1"
+            material="color: white;
+                      src: https://atharv-kumar-31.github.io/vr-Tests/ruins.png;
+                      repeat: 3.285 2520.87570621;
+                      offset: 0.24 0">
+    </a-box>
+
+    <a-box
+            static-body
+            id="ruinsWallBack-2"
+            position="0 2506.65 -20"
+            width="3.91"
+            height="5000"
+            depth="1"
+            material="color: white;
+                      src: https://atharv-kumar-31.github.io/vr-Tests/ruins.png;
+                      repeat: 1.955 2520.87570621;
+                      offset: 0.285 0.11754">
+    </a-box>
+
+    <a-box
+            static-body
+            id="ruinsWallBack-3"
+            position="-5.24 5.31 -20"
+            width="6.57"
+            height="5000"
+            depth="1"
+            material="color: white;
+                      src: https://atharv-kumar-31.github.io/vr-Tests/ruins.png;
+                      repeat: 3.285 2520.87570621;
+                      offset: 0 0">
+    </a-box>
+
+    <a-box
+            static-body
+            id="ruinsWallBack-4"
+            position="-11.24568 5.31 -20"
+            width="6.57"
+            height="5000"
+            depth="1"
+            material="color: white;
+                      src: https://atharv-kumar-31.github.io/vr-Tests/ruins.png;
+                      repeat: 3.285 2520.87570621;
+                      offset: 0 0">
+    </a-box>
+
+    <a-box
+            static-body
+            id="ruinsWallBack-5"
+            position="11.22943 5.31 -20"
+            width="6.57"
+            height="5000"
+            depth="1"
+            material="color: white;
+                      src: https://atharv-kumar-31.github.io/vr-Tests/ruins.png;
+                      repeat: 3.285 2520.87570621;
+                      offset: 0.24 0">
+    </a-box>
+
+    <a-box
+            static-body
+            id="leftWall"
+            position="-14.53 0.21 5.37"
+            rotation="0 90 0"
+            geometry="primitive: box; width: 50; depth: 1; height: 5000"
+            material="src: https://atharv-kumar-31.github.io/vr-Tests/ruins.png;
+                      repeat: 25.0381097561 2479.2971675">
+    </a-box>
+
+    <a-gltf-model
+            static-body
+            id="flowey"
+            src="#floweyAsset"
+            position="0 0.02192 -12.32248"
+            scale="0.1 0.1 0.1"
+            rotation="0 7.595151381978188 0"
+            animation="property: rotation;
+                       from: 0 0 0;
+                       to: 0 180 0;
+                       dur: 10000">
+    </a-gltf-model>
+
+    <a-plane
+            static-body
+            color="green"
+            position="0 0 0"
+            rotation="-90 0 0"
+            height="1000"
+            width="1000">
+    </a-plane>
+
+    <a-entity
+            id="soundSource"
+            position="0 1 -20"
+            sound="src: #bestFriend;
+                   autoplay: true;
+                   loop: true;
+                   positional: true;
+                   refDistance: 2;
+                   rolloffFactor: 1">
+    </a-entity>
+
+    <a-sphere
+            radius="10"
+            position="0 -9.8 0"
+            src="https://atharv-kumar-31.github.io/vr-Tests/flowers.jpg"
+            repeat="10 10"
+            rotation="0 90 0">
+    </a-sphere>
+
+    <a-sphere
+            class="bullet"
+            id="pellet"
+            position="0 2 -5"
+            material="visible: false">
+    </a-sphere>
+</a-scene>
+
+<div class="dialogue-box">
+    <img class="portrait" src="flowey.png" alt="Flowey">
+    <div id="text"></div>
+</div>
+
+<script>
+    const scene = document.querySelector("a-scene");
+    const camera = document.querySelector("#camera");
+    const text = document.querySelector("#text");
+    const box = document.querySelector(".dialogue-box");
+    const vrDialogue = document.querySelector("#vrDialogue");
+    const canvas = document.querySelector("#dialogueCanvas");
+    const ctx = canvas.getContext("2d");
+    const portrait = document.querySelector(".portrait");
+
+    const messages = [
+        "Howdy!\nI'm [y]FLOWEY[/y].\n[y]FLOWEY[/y] the [y]FLOWER[/y]!",
+        "Hmmm...",
+        "You're new to the UNDERGROUND, aren'tcha?",
+        "Golly, you must be so confused.",
+        "Someone ought to teach you how things work around here!",
+        "I guess little old me will have to do.",
+        "Ready?\nHere we go!"
+    ];
+
+    const typingSpeed = 55;
+    const initialDelay = 10000;
+
+    let index = 0;
+    let line = 0;
+    let timer;
+    let textReady = false;
+    let collisionReady = false;
+    let done = false;
+
+    function plainMessage(message) {
+        return message.replace(/\[\/?y\]/g, "");
+    }
+
+    function renderText(value, limit = Infinity) {
+        text.replaceChildren();
+
+        let yellow = false;
+        let count = 0;
+        let content;
+
+        function newRow() {
+            const row = document.createElement("div");
+            row.className = "dialogue-line";
+
+            content = document.createElement("span");
+            content.className = "line-content";
+
+            row.appendChild(content);
+            text.appendChild(row);
         }
-        function startDialogue() {
-            clearTimeout(timer);
-            index = 0;
-            text.textContent = "";
-            typeLetter();
-        }
 
-       box.addEventListener("click", function () {
-            if (!ready) return;
+        newRow();
 
-            if (index < messages[line].length) {
-                clearTimeout(timer);
-                text.textContent = messages[line];
-                index = messages[line].length;
+        const parts = value.split(/(\[y\]|\[\/y\]|\n)/);
+
+        for (const part of parts) {
+            if (part === "[y]") {
+                yellow = true;
+            } else if (part === "[/y]") {
+                yellow = false;
+            } else if (part === "\n") {
+                if (count >= limit) break;
+
+                count++;
+                newRow();
             } else {
-                startDialogue();
-            }
-        });
-        function runText(){
-            done = false;
-            
-            const wait = new Promise(resolve => setTimeout(resolve, delay));
-            const fontLoaded = document.fonts
-            .load('32px "Determination Mono"')
-            .catch(console.error);
+                const remaining = Math.max(0, limit - count);
+                const visible = part.slice(0, remaining);
 
-            Promise.all([wait, fontLoaded]).then(function () {
-                box.style.visibility = "visible";
-                ready = true;
-                startDialogue();
-            });}
-        window.addEventListener('load', () => {
-            runText()
-        });
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Enter') {
-                delay = 0;
-                if (done == true){
-                if (line == messages.length - 1) {
-                    line = 0;
+                if (visible) {
+                    const span = document.createElement("span");
+
+                    span.style.color =
+                        yellow ? "#ffff00" : "#ffffff";
+
+                    span.textContent = visible;
+                    content.appendChild(span);
+                    count += visible.length;
                 }
-                else {
-                    line = line + 1;
-                }
-                
-                runText()
-                console.log("next")
-                console.log(line)
+
+                if (visible.length < part.length) break;
+            }
+        }
+
+        drawVRDialogue();
+    }
+
+    function drawVRDialogue() {
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.strokeStyle = "white";
+        ctx.lineWidth = 8;
+        ctx.strokeRect(
+            4,
+            4,
+            canvas.width - 8,
+            canvas.height - 8
+        );
+
+        ctx.imageSmoothingEnabled = false;
+
+        if (portrait.complete && portrait.naturalWidth) {
+            const width = 150;
+            const height =
+                width * portrait.naturalHeight /
+                portrait.naturalWidth;
+
+            ctx.drawImage(portrait, 30, 36, width, height);
+        }
+
+        ctx.font = '48px "Determination Mono", monospace';
+        ctx.textBaseline = "top";
+
+        let y = 36;
+
+        for (const row of text.children) {
+            ctx.fillStyle = "white";
+            ctx.fillText("*", 210, y);
+
+            let x = 250;
+            const content = row.querySelector(".line-content");
+
+            for (const span of content.children) {
+                ctx.fillStyle = span.style.color || "white";
+
+                for (const word of span.textContent.split(/(\s+)/)) {
+                    if (!word.trim()) {
+                        const spaceWidth = ctx.measureText(word).width;
+
+                        if (x > 250 && x + spaceWidth <= 990) {
+                            x += spaceWidth;
+                        }
+
+                        continue;
+                    }
+                    const wordWidth = ctx.measureText(word).width;
+
+                    if (
+                        x > 250 &&
+                        x + wordWidth > 990 &&
+                        word.trim()
+                    ) {
+                        x = 250;
+                        y += 60;
+                    }
+
+                    for (const character of word) {
+                        const width =
+                            ctx.measureText(character).width;
+
+                        if (x + width > 990) {
+                            x = 250;
+                            y += 60;
+                        }
+
+                        ctx.fillText(character, x, y);
+                        x += width;
+                    }
                 }
             }
+
+            y += 60;
+        }
+
+        const mesh = vrDialogue.getObject3D("mesh");
+
+        if (mesh && mesh.material.map) {
+            mesh.material.map.needsUpdate = true;
+        }
+    }
+
+    function typeLetter() {
+        const message = messages[line];
+        const length = plainMessage(message).length;
+
+        if (index < length) {
+            index++;
+            renderText(message, index);
+        }
+
+        if (index < length) {
+            timer = setTimeout(typeLetter, typingSpeed);
+        } else {
+            done = true;
+        }
+    }
+
+    function startDialogue() {
+        clearTimeout(timer);
+        index = 0;
+        done = false;
+        renderText("");
+        typeLetter();
+    }
+
+    function finishDialogue() {
+        if (!textReady) return;
+
+        clearTimeout(timer);
+        index = plainMessage(messages[line]).length;
+        renderText(messages[line]);
+        done = true;
+    }
+
+    function advanceDialogue() {
+        if (!textReady) return;
+
+        if (!done) {
+            finishDialogue();
+        } else {
+            line = (line + 1) % messages.length;
+            startDialogue();
+        }
+    }
+
+    box.addEventListener("click", advanceDialogue);
+    vrDialogue.addEventListener("click", advanceDialogue);
+
+    document.addEventListener("keydown", function (event) {
+        if (!textReady || event.repeat) return;
+
+        const key = event.key.toLowerCase();
+
+        if (key === "enter" || key === "z") {
+            event.preventDefault();
+            advanceDialogue();
+        } else if (key === "shift" || key === "x") {
+            event.preventDefault();
+            finishDialogue();
+        }
+    });
+
+    function updateDialogueVisibility() {
+        const inVR = scene.is("vr-mode");
+
+        document.body.classList.toggle("in-vr", inVR);
+        vrDialogue.setAttribute("visible", inVR && textReady);
+    }
+
+    scene.addEventListener(
+        "enter-vr",
+        updateDialogueVisibility
+    );
+
+    scene.addEventListener(
+        "exit-vr",
+        updateDialogueVisibility
+    );
+
+    portrait.addEventListener("load", drawVRDialogue);
+
+    vrDialogue.addEventListener(
+        "materialtextureloaded",
+        drawVRDialogue
+    );
+
+    const wait = new Promise(function (resolve) {
+        setTimeout(resolve, initialDelay);
+    });
+
+    const fontLoaded = document.fonts
+        .load('32px "Determination Mono"')
+        .catch(console.error);
+
+    Promise.all([wait, fontLoaded]).then(function () {
+        textReady = true;
+        box.style.visibility = "visible";
+        startDialogue();
+        updateDialogueVisibility();
+    });
+
+    // Start/resume positional music after user input.
+    function startSound() {
+        const source = document.querySelector("#soundSource");
+        const sound = source.components.sound;
+
+        if (!sound || !sound.loaded) return;
+
+        if (
+            sound.listener &&
+            sound.listener.context.state === "suspended"
+        ) {
+            sound.listener.context.resume().catch(console.error);
+        }
+
+        if (!sound.isPlaying) {
+            sound.playSound();
+        }
+    }
+
+    window.addEventListener("click", startSound);
+    window.addEventListener("keydown", startSound);
+
+    scene.addEventListener("loaded", function () {
+        requestAnimationFrame(function () {
+            scene.object3D.updateMatrixWorld(true);
+            collisionReady = true;
         });
-    </script>
+    });
+
+    camera.addEventListener("hit", function (event) {
+        if (!collisionReady || !event.detail.el) return;
+
+        const bullet = event.detail.el;
+
+        console.log("Touched this bullet:", bullet);
+        bullet.setAttribute("color", "red");
+    });
+
+    camera.addEventListener("hitend", function (event) {
+        if (!collisionReady || !event.detail.el) return;
+
+        console.log("Done:", event.detail.el);
+    });
+
+    function shoot() {
+    }
+</script>
 </body>
 </html>
